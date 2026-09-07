@@ -1,0 +1,827 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Clínica Salud Integral",
+    "version": "1.0.0",
+    "description": "API académica con Prisma y JWT. Registro público por rol según kit del curso; no es una política de cuentas para producción."
+  },
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Registrar cuenta de prueba",
+        "description": "Flujo académico del kit JWT.",
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Registro"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Autenticación"
+        ],
+        "summary": "Obtener token",
+        "description": "Flujo académico del kit JWT.",
+        "security": [],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/patients": {
+      "post": {
+        "tags": [
+          "Pacientes"
+        ],
+        "summary": "Registrar paciente",
+        "description": "Rol: RECEPCIONISTA. Fechas de agenda y reportes en UTC.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Paciente"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Pacientes"
+        ],
+        "summary": "Listar pacientes",
+        "description": "Rol: RECEPCIONISTA. Fechas de agenda y reportes en UTC.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/patients/{id}": {
+      "get": {
+        "tags": [
+          "Pacientes"
+        ],
+        "summary": "Expediente completo",
+        "description": "Rol: RECEPCIONISTA. Fechas de agenda y reportes en UTC.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/doctors": {
+      "get": {
+        "tags": [
+          "Directorio"
+        ],
+        "summary": "Buscar médicos",
+        "description": "Rol: RECEPCIONISTA. Fechas de agenda y reportes en UTC.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "specialty",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/specialties": {
+      "get": {
+        "tags": [
+          "Directorio"
+        ],
+        "summary": "Listar especialidades",
+        "description": "Rol: RECEPCIONISTA. Fechas de agenda y reportes en UTC.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/especialidades": {
+      "post": {
+        "tags": [
+          "Directorio"
+        ],
+        "summary": "Crear especialidad adicional",
+        "description": "Rol: GERENCIA. Fechas de agenda y reportes en UTC.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Especialidad"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/medicos": {
+      "post": {
+        "tags": [
+          "Directorio"
+        ],
+        "summary": "Crear médico adicional",
+        "description": "Rol: GERENCIA. Fechas de agenda y reportes en UTC.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Medico"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/appointments": {
+      "post": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Agendar cita",
+        "description": "Rol: RECEPCIONISTA. Fechas de agenda y reportes en UTC.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Cita"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/doctors/{id}/appointments": {
+      "get": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Agenda del médico",
+        "description": "Rol: MEDICO. Fechas de agenda y reportes en UTC.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/appointments/{id}/status": {
+      "patch": {
+        "tags": [
+          "Citas"
+        ],
+        "summary": "Actualizar estado",
+        "description": "Rol: MEDICO. Fechas de agenda y reportes en UTC.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Estado"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/reports/appointments-by-specialty": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "Volumen por especialidad",
+        "description": "Rol: GERENCIA. Fechas de agenda y reportes en UTC.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/reports/daily-cutoff": {
+      "get": {
+        "tags": [
+          "Reportes"
+        ],
+        "summary": "Corte por fecha de cita",
+        "description": "Rol: GERENCIA. Fechas de agenda y reportes en UTC.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Estado"
+        ],
+        "summary": "Comprobar conexión",
+        "description": "Flujo académico del kit JWT.",
+        "security": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operación correcta"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "401": {
+            "description": "Sin token válido"
+          },
+          "403": {
+            "description": "Rol no autorizado"
+          },
+          "404": {
+            "description": "Registro no encontrado"
+          },
+          "409": {
+            "description": "Registro duplicado"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Login": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "recepcion@clinica.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "ClaveDemo123!"
+          }
+        }
+      },
+      "Registro": {
+        "type": "object",
+        "required": [
+          "email",
+          "password",
+          "role"
+        ],
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "example": "Recepción"
+          },
+          "email": {
+            "type": "string",
+            "example": "recepcion@clinica.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "ClaveDemo123!"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "RECEPCIONISTA",
+              "MEDICO",
+              "GERENCIA"
+            ]
+          }
+        }
+      },
+      "Paciente": {
+        "type": "object",
+        "required": [
+          "nombre",
+          "apellido",
+          "email",
+          "fechaNacimiento"
+        ],
+        "properties": {
+          "nombre": {
+            "type": "string",
+            "example": "Luis"
+          },
+          "apellido": {
+            "type": "string",
+            "example": "Prueba"
+          },
+          "email": {
+            "type": "string",
+            "example": "luis@example.com"
+          },
+          "fechaNacimiento": {
+            "type": "string",
+            "format": "date",
+            "example": "1998-05-15"
+          },
+          "telefono": {
+            "type": "string"
+          }
+        }
+      },
+      "Cita": {
+        "type": "object",
+        "required": [
+          "pacienteId",
+          "medicoId",
+          "fecha"
+        ],
+        "properties": {
+          "pacienteId": {
+            "type": "integer",
+            "example": 1
+          },
+          "medicoId": {
+            "type": "integer",
+            "example": 1
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2030-09-08T15:00:00Z"
+          },
+          "motivo": {
+            "type": "string",
+            "example": "Consulta general"
+          }
+        }
+      },
+      "Estado": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "COMPLETADA",
+              "CANCELADA"
+            ]
+          }
+        }
+      },
+      "Especialidad": {
+        "type": "object",
+        "required": [
+          "nombre"
+        ],
+        "properties": {
+          "nombre": {
+            "type": "string"
+          },
+          "descripcion": {
+            "type": "string"
+          }
+        }
+      },
+      "Medico": {
+        "type": "object",
+        "required": [
+          "nombre",
+          "apellido",
+          "email",
+          "especialidadId"
+        ],
+        "properties": {
+          "nombre": {
+            "type": "string"
+          },
+          "apellido": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "especialidadId": {
+            "type": "integer"
+          },
+          "telefono": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

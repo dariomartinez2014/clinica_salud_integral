@@ -1,0 +1,57 @@
+{
+  "compilerOptions": {
+    // Incluye mi código y el cliente generado por Prisma.
+    "rootDir": ".",
+
+    // Guarda el código compilado en la carpeta dist.
+    "outDir": "./dist",
+
+    // Usa el sistema de módulos de Node.js.
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    // Define la versión de JavaScript para el servidor.
+    "target": "ES2022",
+    "lib": ["ES2022"],
+
+    // Reconoce las variables y herramientas de Node.js.
+    "types": ["node"],
+
+    // Revisa los tipos para detectar errores al compilar.
+    "strict": true,
+
+    // Ayuda a comprobar si un elemento de una lista existe.
+    "noUncheckedIndexedAccess": true,
+
+    // Facilita importar las librerías del proyecto.
+    "esModuleInterop": true,
+
+    // Omite la revisión interna de tipos de las dependencias.
+    "skipLibCheck": true,
+
+    // Permite localizar errores en el archivo TypeScript original.
+    "sourceMap": true,
+
+    // Evita generar archivos adicionales de declaraciones de tipos.
+    "declaration": false,
+    "declarationMap": false,
+
+    // No genera una nueva compilación si encuentra errores.
+    "noEmitOnError": true,
+
+    // Convierte las extensiones .ts de imports relativos a .js.
+    "rewriteRelativeImportExtensions": true
+  },
+
+  // Compila los archivos del servidor y del cliente de Prisma.
+  "include": [
+    "src/**/*.ts",
+    "generated/prisma/**/*.ts", "prisma/seed.ts"
+  ],
+
+  // Excluye las dependencias y la carpeta de salida.
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
