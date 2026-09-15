@@ -1,0 +1,5 @@
+### Pacientes de Semana 5
+GET http://localhost:3000/pacientes
+
+### Medicos de Semana 5
+GET http://localhost:3000/medicos
