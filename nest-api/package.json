@@ -1,7 +1,7 @@
 {
   "name": "clinica-salud-integral-nest",
   "version": "0.0.1",
-  "description": "Tarea del lunes: NestJS, PrismaService global, pacientes y medicos",
+  "description": "Clínica NestJS con CRUD de pacientes y médicos y PrismaService global",
   "author": "",
   "private": true,
   "license": "UNLICENSED",
@@ -15,7 +15,8 @@
     "start:prod": "node dist/src/main.js",
     "lint": "oxlint src/",
     "prisma:generate": "prisma generate",
-    "prisma:validate": "prisma validate"
+    "prisma:validate": "prisma validate",
+    "test:e2e": "pnpm run build && node test/crud.e2e.mjs"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",

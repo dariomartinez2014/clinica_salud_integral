@@ -1,5 +1,70 @@
-### Pacientes de Semana 5
-GET http://localhost:3000/pacientes
+@baseUrl = http://localhost:3000
+@especialidadId = 1
 
-### Medicos de Semana 5
-GET http://localhost:3000/medicos
+# Ejecuta los POST primero. REST Client obtiene los IDs de sus respuestas.
+
+### pacientes — Crear
+# @name crearpaciente
+POST {{baseUrl}}/pacientes
+Content-Type: application/json
+
+{
+  "nombre": "Prueba",
+  "apellido": "Martes",
+  "email": "paciente-{{$guid}}@example.com",
+  "telefono": "55550000",
+  "fechaNacimiento": "2000-01-15T00:00:00.000Z"
+}
+
+### pacientes — Listar
+GET {{baseUrl}}/pacientes
+
+### pacientes — Buscar por ID
+GET {{baseUrl}}/pacientes/{{crearpaciente.response.body.$.id}}
+
+### pacientes — Actualizar parcialmente
+PUT {{baseUrl}}/pacientes/{{crearpaciente.response.body.$.id}}
+Content-Type: application/json
+
+{
+  "telefono": "55551111"
+}
+
+### pacientes — Eliminar
+DELETE {{baseUrl}}/pacientes/{{crearpaciente.response.body.$.id}}
+
+### pacientes — Confirmar 404 después de eliminar
+GET {{baseUrl}}/pacientes/{{crearpaciente.response.body.$.id}}
+
+### medicos — Crear
+# @name crearmedico
+POST {{baseUrl}}/medicos
+Content-Type: application/json
+
+{
+  "nombre": "Prueba",
+  "apellido": "Martes",
+  "email": "medico-{{$guid}}@example.com",
+  "telefono": "55550000",
+  "especialidadId": {{especialidadId}}
+}
+
+### medicos — Listar
+GET {{baseUrl}}/medicos
+
+### medicos — Buscar por ID
+GET {{baseUrl}}/medicos/{{crearmedico.response.body.$.id}}
+
+### medicos — Actualizar parcialmente
+PUT {{baseUrl}}/medicos/{{crearmedico.response.body.$.id}}
+Content-Type: application/json
+
+{
+  "telefono": "55551111"
+}
+
+### medicos — Eliminar
+DELETE {{baseUrl}}/medicos/{{crearmedico.response.body.$.id}}
+
+### medicos — Confirmar 404 después de eliminar
+GET {{baseUrl}}/medicos/{{crearmedico.response.body.$.id}}
