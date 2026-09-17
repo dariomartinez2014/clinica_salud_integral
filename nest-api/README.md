@@ -1,51 +1,64 @@
-# NestJS — tarea del lunes
+# Clínica — CRUD con NestJS y PrismaService
 
-API de la Clínica Salud Integral con arquitectura Module / Controller / Service.
-Reutiliza exactamente el schema y la base de datos de la Semana 5.
+La API NestJS vive en nest-api. Reutiliza los modelos Paciente y Medico y la base PostgreSQL de la Semana 5.
 
-## Arranque
+## Arrancar
 
-Requisitos: Node.js 22.12 o posterior y pnpm 11.19.
-Desde esta carpeta:
+Desde la carpeta nest-api, con Node.js 22.12 o posterior y pnpm 11:
 
-```sh
+~~~powershell
 pnpm install
-# Copiar el .env de Semana 5 a esta carpeta, conservando DATABASE_URL.
-pnpm prisma generate
-pnpm run build
+pnpm prisma:generate
 pnpm run start:dev
-```
+~~~
 
-No ejecutar migraciones ni seed. Si Express ocupa el puerto 3000, detenerlo o elegir otro PORT en .env.
-El .env es local y no se incluye en Git.
+Debe existir un archivo .env local con DATABASE_URL. Si el puerto 3000 está ocupado, usa otra terminal y ejecuta $env:PORT='3001' antes de iniciar. Cambia también baseUrl en Postman.
+No se necesitan migraciones ni seed para esta entrega.
 
 ## Endpoints
 
-| Método | Ruta | Consulta |
-| --- | --- | --- |
-| GET | /pacientes | prisma.paciente.findMany() |
-| GET | /medicos | prisma.medico.findMany() |
+| Método | Pacientes | Médicos | Resultado |
+| --- | --- | --- | --- |
+| GET | /pacientes | /medicos | 200: lista |
+| GET | /pacientes/:id | /medicos/:id | 200: registro; 404 si no existe |
+| POST | /pacientes | /medicos | 201: registro creado |
+| PUT | /pacientes/:id | /medicos/:id | 200: registro actualizado; 404 si no existe |
+| DELETE | /pacientes/:id | /medicos/:id | 200: registro eliminado; 404 si no existe |
 
-Probar http://localhost:3000/pacientes y http://localhost:3000/medicos en Postman o Thunder Client. También se incluye solicitudes.http.
+## Cómo funciona
 
-## Arquitectura
+- Los decoradores @Get, @Post, @Put y @Delete definen las rutas en cada Controller.
+- @Param extrae el ID; ParseIntPipe lo convierte a number y responde 400 si no es un entero válido.
+- @Body extrae el JSON y lo entrega al Service. El tipo any es temporal: los DTO con class-validator corresponden a la siguiente clase.
+- Los Services reciben PrismaService por constructor y usan findMany, findUnique, create, update y delete.
+- findUnique devuelve null si no existe el registro. El Controller espera la promesa con await y lanza NotFoundException para responder 404.
+- En update y delete, el Service transforma el error P2025 de Prisma en 404. Los demás errores se propagan.
+- Los tipos de creación toman los campos editables del modelo Prisma. Partial permite enviar solo los campos que cambian al actualizar.
 
-Cada Controller llama a su Service. Los Services reciben PrismaService por constructor.
-PrismaModule usa @Global(), exporta PrismaService y se importa una sola vez en AppModule.
-PrismaService usa PrismaPg, conecta al iniciar y desconecta al cerrar Nest.
-main.ts carga dotenv/config antes de los demás imports.
+Paciente requiere nombre, apellido, email y fechaNacimiento en formato ISO, por ejemplo 2000-01-15T00:00:00.000Z. Medico requiere nombre, apellido, email y especialidadId de una especialidad existente. telefono es opcional y acepta null.
+Los emails deben ser únicos. La validación de cuerpos y las respuestas específicas para emails duplicados o relaciones inválidas quedan para una entrega posterior. No elimines registros con citas relacionadas: el esquema restringe esa operación.
 
-El schema genera el cliente en generated/prisma. Desde src/prisma/prisma.service.ts corresponde ../../generated/prisma/client.js; se corrige así la ruta inconsistente del ejemplo de la tarea. La extensión .js se usa por ESM.
-La compilación incluye el cliente generado, por lo que producción arranca con `pnpm run start:prod` desde dist/src/main.js.
+## Prueba con Postman
 
-## Verificación del 14 de septiembre de 2026
+1. Inicia la API e importa crud-martes.postman_collection.json.
+2. Revisa las variables baseUrl y especialidadId. En la base de práctica se comprobó que existe la especialidad 1.
+3. Ejecuta las carpetas en orden, desde Crear hasta Confirmar 404 después de eliminar, o utiliza el Collection Runner.
+4. Los POST guardan automáticamente pacienteId y medicoId. Cada ejecución usa emails de ejemplo únicos.
+5. Comprueba los doce resultados: los diez endpoints y ambos GET con ID inexistente después de eliminar los registros de prueba.
 
-- Generación del cliente y compilación con Nest correctas.
-- GET /pacientes: HTTP 200, 3 registros.
-- GET /medicos: HTTP 200, 7 registros.
-- Las respuestas coinciden con las consultas a PostgreSQL usando el .env original.
-- Se usó un puerto temporal para la prueba, sin modificar registros, migraciones ni seed.
+solicitudes.http incluye el mismo recorrido para la extensión REST Client de VS Code. Sus referencias a respuestas pertenecen a REST Client; para Postman usa el JSON de la colección.
 
-Los endpoints sin autenticación corresponden al alcance académico del lunes.
-La API Express anterior permanece en la raíz del repositorio.
-El Pull Request debe revisarse antes del merge hacia main.
+## Prueba automática
+
+~~~powershell
+pnpm run test:e2e
+pnpm run lint
+~~~
+
+La prueba compila y abre Nest en un puerto libre. Ejecuta 24 solicitudes HTTP contra PostgreSQL: los diez endpoints, persistencia de actualizaciones parciales, 404 en GET/PUT/DELETE y 400 con IDs inválidos. Crea datos temporales con email de example.com y los elimina al terminar, incluso si falla una comprobación. Solo modifica esos registros; usa una base de práctica con al menos una especialidad.
+
+Verificado el 15 de septiembre de 2026: compilación y lint correctos; las 24 solicitudes pasaron. Los casos manuales de Postman quedan listos para repetirlos.
+
+## Git
+
+La rama feature/crud-pacientes parte de main después del merge del PR #2 del lunes. El PR del martes debe revisarse antes de su merge.
