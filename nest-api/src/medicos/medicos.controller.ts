@@ -1,3 +1,5 @@
+import { CreateMedicoDto } from './dto/create-medico.dto.js';
+import { UpdateMedicoDto } from './dto/update-medico.dto.js';
 import {
   Body,
   Controller,
@@ -30,12 +32,12 @@ export class MedicosController {
   }
 
   @Post()
-  create(@Body() body: any) {
+  create(@Body() body: CreateMedicoDto) {
     return this.service.create(body);
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
+  update(@Param('id', ParseIntPipe) id: number, @Body() body: UpdateMedicoDto) {
     return this.service.update(id, body);
   }
 

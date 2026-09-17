@@ -1,11 +1,8 @@
+import { CreateMedicoDto } from './dto/create-medico.dto.js';
+import { UpdateMedicoDto } from './dto/update-medico.dto.js';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-
-type CrearMedico = Pick<
-  Prisma.MedicoUncheckedCreateInput,
-  'nombre' | 'apellido' | 'email' | 'telefono' | 'especialidadId'
->;
 
 @Injectable()
 export class MedicosService {
@@ -19,11 +16,11 @@ export class MedicosService {
     return this.prisma.medico.findUnique({ where: { id } });
   }
 
-  create(data: CrearMedico) {
+  create(data: CreateMedicoDto) {
     return this.prisma.medico.create({ data });
   }
 
-  async update(id: number, data: Partial<CrearMedico>) {
+  async update(id: number, data: UpdateMedicoDto) {
     try {
       return await this.prisma.medico.update({ where: { id }, data });
     } catch (error) {

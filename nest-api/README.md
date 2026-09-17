@@ -29,14 +29,14 @@ No se necesitan migraciones ni seed para esta entrega.
 
 - Los decoradores @Get, @Post, @Put y @Delete definen las rutas en cada Controller.
 - @Param extrae el ID; ParseIntPipe lo convierte a number y responde 400 si no es un entero válido.
-- @Body extrae el JSON y lo entrega al Service. El tipo any es temporal: los DTO con class-validator corresponden a la siguiente clase.
+- @Body usa DTOs con class-validator. ValidationPipe global transforma el body en una instancia y descarta campos no declarados antes del Service.
 - Los Services reciben PrismaService por constructor y usan findMany, findUnique, create, update y delete.
 - findUnique devuelve null si no existe el registro. El Controller espera la promesa con await y lanza NotFoundException para responder 404.
 - En update y delete, el Service transforma el error P2025 de Prisma en 404. Los demás errores se propagan.
-- Los tipos de creación toman los campos editables del modelo Prisma. Partial permite enviar solo los campos que cambian al actualizar.
+- Los DTOs declaran los campos editables del modelo Prisma. PartialType permite omitir campos al actualizar; skipNullProperties: false rechaza null en campos obligatorios. telefono conserva su opción de null.
 
 Paciente requiere nombre, apellido, email y fechaNacimiento en formato ISO, por ejemplo 2000-01-15T00:00:00.000Z. Medico requiere nombre, apellido, email y especialidadId de una especialidad existente. telefono es opcional y acepta null.
-Los emails deben ser únicos. La validación de cuerpos y las respuestas específicas para emails duplicados o relaciones inválidas quedan para una entrega posterior. No elimines registros con citas relacionadas: el esquema restringe esa operación.
+Los emails deben ser únicos. Los cuerpos inválidos responden 400. Las respuestas específicas para emails duplicados o relaciones inválidas quedan para una entrega posterior. No elimines registros con citas relacionadas: el esquema restringe esa operación.
 
 ## Prueba con Postman
 
@@ -62,3 +62,22 @@ Verificado el 15 de septiembre de 2026: compilación y lint correctos; las 24 so
 ## Git
 
 La rama feature/crud-pacientes parte de main después del merge del PR #2 del lunes. El PR del martes debe revisarse antes de su merge.
+
+## Miércoles — DTOs y validación
+
+Rama: feature/dtos-validacion, basada en el merge del martes.
+
+Dependencias: class-validator, class-transformer y @nestjs/mapped-types. Los cuatro DTOs están en src/pacientes/dto y src/medicos/dto. El ValidationPipe de src/main.ts usa whitelist: true y transform: true.
+
+Nombre y apellido requieren texto no vacío; email debe ser válido; telefono es texto opcional; especialidadId es un entero positivo. fechaNacimiento exige ISO válido y el Service rechaza fechas futuras tanto en POST como PUT, antes de Prisma. Se aceptan fechas como 2000-01-15 y se convierten a Date para Prisma.
+
+Pruebas: pnpm run test:e2e y pnpm run lint. Se verificaron 40 solicitudes HTTP contra PostgreSQL, incluidos correos inválidos, campos obligatorios, fechas inválidas/futuras, actualizaciones parciales y CRUD. La prueba comprueba directamente que el Service recibe una instancia del DTO sin campoExtra.
+
+Para Postman importa validacion-miercoles.postman_collection.json y ejecuta en orden. Ajusta baseUrl y especialidadId. Los registros de prueba se eliminan después de cada creación. Si Express ocupa 3000, inicia Nest con el puerto 3101:
+
+~~~powershell
+$env:PORT='3101'
+pnpm run start:dev
+~~~
+
+El PR del miércoles debe revisarse antes del merge.

@@ -1,0 +1,273 @@
+{
+  "info": {
+    "name": "Miércoles - DTOs y validación",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Ejecutar en orden contra la base de práctica. Usa especialidadId 1; cambiar si no existe. Cada creación va seguida de su eliminación."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3101"
+    }
+  ],
+  "item": [
+    {
+      "name": "pacientes",
+      "item": [
+        {
+          "name": "Correo inválido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/pacientes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prueba DTO\",\n  \"apellido\": \"Temporal\",\n  \"email\": \"invalido\",\n  \"telefono\": \"55550000\",\n  \"fechaNacimiento\": \"2000-01-15\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Campo extra descartado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/pacientes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prueba DTO\",\n  \"apellido\": \"Temporal\",\n  \"email\": \"dto-{{$guid}}@example.com\",\n  \"telefono\": \"55550000\",\n  \"fechaNacimiento\": \"2000-01-15\",\n  \"campoExtra\": \"descartar\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Sin campo extra', () => pm.expect(pm.response.json()).not.to.have.property('campoExtra'));",
+                  "pm.collectionVariables.set('pacientesId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar registro temporal",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/pacientes/{{pacientesId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Datos válidos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/pacientes",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prueba DTO\",\n  \"apellido\": \"Temporal\",\n  \"email\": \"dto-{{$guid}}@example.com\",\n  \"telefono\": \"55550000\",\n  \"fechaNacimiento\": \"2000-01-15\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Sin campo extra', () => pm.expect(pm.response.json()).not.to.have.property('campoExtra'));",
+                  "pm.collectionVariables.set('pacientesId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar registro temporal",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/pacientes/{{pacientesId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "medicos",
+      "item": [
+        {
+          "name": "Correo inválido",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/medicos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prueba DTO\",\n  \"apellido\": \"Temporal\",\n  \"email\": \"invalido\",\n  \"telefono\": \"55550000\",\n  \"especialidadId\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 400', () => pm.response.to.have.status(400));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Campo extra descartado",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/medicos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prueba DTO\",\n  \"apellido\": \"Temporal\",\n  \"email\": \"dto-{{$guid}}@example.com\",\n  \"telefono\": \"55550000\",\n  \"especialidadId\": 1,\n  \"campoExtra\": \"descartar\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Sin campo extra', () => pm.expect(pm.response.json()).not.to.have.property('campoExtra'));",
+                  "pm.collectionVariables.set('medicosId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar registro temporal",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/medicos/{{medicosId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Datos válidos",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/medicos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Prueba DTO\",\n  \"apellido\": \"Temporal\",\n  \"email\": \"dto-{{$guid}}@example.com\",\n  \"telefono\": \"55550000\",\n  \"especialidadId\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Sin campo extra', () => pm.expect(pm.response.json()).not.to.have.property('campoExtra'));",
+                  "pm.collectionVariables.set('medicosId', pm.response.json().id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Eliminar registro temporal",
+          "request": {
+            "method": "DELETE",
+            "url": "{{baseUrl}}/medicos/{{medicosId}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
