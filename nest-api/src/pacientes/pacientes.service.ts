@@ -1,11 +1,6 @@
 import { CreatePacienteDto } from './dto/create-paciente.dto.js';
 import { UpdatePacienteDto } from './dto/update-paciente.dto.js';
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { Prisma } from '../../generated/prisma/client.js';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
@@ -27,27 +22,17 @@ export class PacientesService {
     });
   }
 
-  async update(id: number, data: UpdatePacienteDto) {
+  update(id: number, data: UpdatePacienteDto) {
     this.validarFechaNacimiento(data.fechaNacimiento);
-    try {
-      return await this.prisma.paciente.update({
-        where: { id },
-        data: {
-          ...data,
-          ...(data.fechaNacimiento !== undefined
-            ? { fechaNacimiento: new Date(data.fechaNacimiento) }
-            : {}),
-        },
-      });
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
-      ) {
-        throw new NotFoundException('Paciente no encontrado');
-      }
-      throw error;
-    }
+    return this.prisma.paciente.update({
+      where: { id },
+      data: {
+        ...data,
+        ...(data.fechaNacimiento !== undefined
+          ? { fechaNacimiento: new Date(data.fechaNacimiento) }
+          : {}),
+      },
+    });
   }
 
   private validarFechaNacimiento(fechaNacimiento?: string) {
@@ -61,17 +46,7 @@ export class PacientesService {
     }
   }
 
-  async remove(id: number) {
-    try {
-      return await this.prisma.paciente.delete({ where: { id } });
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
-      ) {
-        throw new NotFoundException('Paciente no encontrado');
-      }
-      throw error;
-    }
+  remove(id: number) {
+    return this.prisma.paciente.delete({ where: { id } });
   }
 }

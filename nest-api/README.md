@@ -32,7 +32,7 @@ No se necesitan migraciones ni seed para esta entrega.
 - @Body usa DTOs con class-validator. ValidationPipe global transforma el body en una instancia y descarta campos no declarados antes del Service.
 - Los Services reciben PrismaService por constructor y usan findMany, findUnique, create, update y delete.
 - findUnique devuelve null si no existe el registro. El Controller espera la promesa con await y lanza NotFoundException para responder 404.
-- En update y delete, el Service transforma el error P2025 de Prisma en 404. Los demás errores se propagan.
+- El filtro global PrismaExceptionFilter traduce P2002 a 409 y P2025 a 404. Los Services ya no capturan esos errores.
 - Los DTOs declaran los campos editables del modelo Prisma. PartialType permite omitir campos al actualizar; skipNullProperties: false rechaza null en campos obligatorios. telefono conserva su opción de null.
 
 Paciente requiere nombre, apellido, email y fechaNacimiento en formato ISO, por ejemplo 2000-01-15T00:00:00.000Z. Medico requiere nombre, apellido, email y especialidadId de una especialidad existente. telefono es opcional y acepta null.
@@ -81,3 +81,15 @@ pnpm run start:dev
 ~~~
 
 El PR del miércoles debe revisarse antes del merge.
+
+## Jueves — Exception Filters
+
+Rama feature/exception-filters, desde el merge del PR #4 del miércoles.
+
+El filtro src/prisma/prisma-exception.filter.ts captura únicamente PrismaClientKnownRequestError del cliente generado. Convierte P2002 en ConflictException (409) y P2025 en NotFoundException (404). Extiende BaseExceptionFilter para enviar la respuesta HTTP usando las excepciones built-in. Devolver solamente getResponse() desde catch no enviaría la respuesta; tampoco se relanza el error desde el filtro. Los demás códigos se delegan al filtro base con una respuesta 500 genérica.
+
+Se registra en main.ts con app.useGlobalFilters(new PrismaExceptionFilter(app.getHttpAdapter())). Se eliminaron los try/catch de Prisma de ambos Services. Los Controllers no tienen try/catch y sus GET conservan NotFoundException. La validación del miércoles sigue activa.
+
+Verificación: compilación y 42 solicitudes HTTP contra PostgreSQL, incluidos POST duplicados 409, PUT/DELETE inexistentes 404, GET inexistentes 404 y validaciones 400 en ambos módulos. Importa errores-jueves.postman_collection.json y ejecuta en orden en la base de práctica; ajusta baseUrl (3101 por defecto) y especialidadId si es necesario. Los datos temporales se eliminan en el recorrido.
+
+El PR del jueves debe permanecer abierto hasta su revisión.

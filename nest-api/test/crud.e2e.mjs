@@ -1,3 +1,4 @@
+import { PrismaExceptionFilter } from '../dist/src/prisma/prisma-exception.filter.js';
 import { ValidationPipe } from '@nestjs/common';
 import { PacientesService } from '../dist/src/pacientes/pacientes.service.js';
 import { MedicosService } from '../dist/src/medicos/medicos.service.js';
@@ -11,6 +12,7 @@ import { PrismaService } from '../dist/src/prisma/prisma.service.js';
 
 // Ejecutar contra la base de práctica. Solo se modifican registros creados aquí.
 const app = await NestFactory.create(AppModule, { logger: false });
+app.useGlobalFilters(new PrismaExceptionFilter(app.getHttpAdapter()));
 app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 for (const [serviceType, dtoType] of [
   [PacientesService, CreatePacienteDto],
@@ -107,6 +109,12 @@ try {
     created.push({ model, id: item.id, email: payload.email });
     assert.ok(Number.isInteger(item.id));
     assert.equal(item.email, payload.email);
+    const duplicate = await request('POST', '/' + route, 409, payload);
+    assert.deepEqual(duplicate, {
+      statusCode: 409,
+      message: 'Ya existe un registro con ese valor único',
+      error: 'Conflict',
+    });
     await request('PUT', '/' + route + '/' + item.id, 400, {
       email: 'invalido',
     });
@@ -137,7 +145,7 @@ try {
     const deleted = await request('DELETE', '/' + route + '/' + item.id, 200);
     assert.equal(deleted.id, item.id);
     await request('GET', '/' + route + '/' + item.id, 404);
-    await request('PUT', '/' + route + '/' + item.id, 404, {
+    const missing = await request('PUT', '/' + route + '/' + item.id, 404, {
       nombre: 'No existe',
     });
     await request('DELETE', '/' + route + '/' + item.id, 404);
