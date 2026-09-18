@@ -1,3 +1,5 @@
+import { CreatePacienteDto } from './dto/create-paciente.dto.js';
+import { UpdatePacienteDto } from './dto/update-paciente.dto.js';
 import {
   Body,
   Controller,
@@ -30,12 +32,15 @@ export class PacientesController {
   }
 
   @Post()
-  create(@Body() body: any) {
+  create(@Body() body: CreatePacienteDto) {
     return this.service.create(body);
   }
 
   @Put(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdatePacienteDto,
+  ) {
     return this.service.update(id, body);
   }
 

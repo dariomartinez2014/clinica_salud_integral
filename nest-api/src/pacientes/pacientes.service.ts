@@ -1,11 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreatePacienteDto } from './dto/create-paciente.dto.js';
+import { UpdatePacienteDto } from './dto/update-paciente.dto.js';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '../../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-
-type CrearPaciente = Pick<
-  Prisma.PacienteCreateInput,
-  'nombre' | 'apellido' | 'email' | 'telefono' | 'fechaNacimiento'
->;
 
 @Injectable()
 export class PacientesService {
@@ -19,13 +20,25 @@ export class PacientesService {
     return this.prisma.paciente.findUnique({ where: { id } });
   }
 
-  create(data: CrearPaciente) {
-    return this.prisma.paciente.create({ data });
+  create(data: CreatePacienteDto) {
+    this.validarFechaNacimiento(data.fechaNacimiento);
+    return this.prisma.paciente.create({
+      data: { ...data, fechaNacimiento: new Date(data.fechaNacimiento) },
+    });
   }
 
-  async update(id: number, data: Partial<CrearPaciente>) {
+  async update(id: number, data: UpdatePacienteDto) {
+    this.validarFechaNacimiento(data.fechaNacimiento);
     try {
-      return await this.prisma.paciente.update({ where: { id }, data });
+      return await this.prisma.paciente.update({
+        where: { id },
+        data: {
+          ...data,
+          ...(data.fechaNacimiento !== undefined
+            ? { fechaNacimiento: new Date(data.fechaNacimiento) }
+            : {}),
+        },
+      });
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -34,6 +47,17 @@ export class PacientesService {
         throw new NotFoundException('Paciente no encontrado');
       }
       throw error;
+    }
+  }
+
+  private validarFechaNacimiento(fechaNacimiento?: string) {
+    if (
+      fechaNacimiento !== undefined &&
+      new Date(fechaNacimiento) > new Date()
+    ) {
+      throw new BadRequestException(
+        'La fecha de nacimiento no puede ser futura',
+      );
     }
   }
 
