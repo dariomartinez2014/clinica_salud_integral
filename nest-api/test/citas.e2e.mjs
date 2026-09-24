@@ -81,7 +81,7 @@ try {
     motivo: 'Prueba de comunicación entre módulos',
   };
   // Buscar un ID realmente inexistente, sin depender de los datos del usuario.
-  let missingId = -1;
+  let missingId = 2147483647;
   while (await prisma.paciente.findUnique({ where: { id: missingId } }))
     missingId--;
   const missing = await request('POST', 404, {

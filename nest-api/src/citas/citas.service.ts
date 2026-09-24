@@ -2,13 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { PacientesService } from '../pacientes/pacientes.service.js';
 
-// Contrato TypeScript temporal; la validación con DTOs queda para otra entrega.
-export interface CrearCita {
-  pacienteId: number;
-  medicoId: number;
-  fecha: string;
-  motivo?: string;
-}
+import type { CreateCitaDto } from './dto/create-cita.dto.js';
 
 @Injectable()
 export class CitasService {
@@ -17,7 +11,7 @@ export class CitasService {
     private readonly pacientesService: PacientesService,
   ) {}
 
-  async create(data: CrearCita) {
+  async create(data: CreateCitaDto) {
     const paciente = await this.pacientesService.findOne(data.pacienteId);
     if (!paciente) throw new NotFoundException('El paciente no existe');
 

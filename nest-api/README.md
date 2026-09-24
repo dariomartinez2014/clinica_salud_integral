@@ -93,3 +93,7 @@ Se registra en main.ts con app.useGlobalFilters(new PrismaExceptionFilter(app.ge
 Verificación: compilación y 42 solicitudes HTTP contra PostgreSQL, incluidos POST duplicados 409, PUT/DELETE inexistentes 404, GET inexistentes 404 y validaciones 400 en ambos módulos. Importa errores-jueves.postman_collection.json y ejecuta en orden en la base de práctica; ajusta baseUrl (3101 por defecto) y especialidadId si es necesario. Los datos temporales se eliminan en el recorrido.
 
 El PR del jueves debe permanecer abierto hasta su revisión.
+
+## Swagger (martes)
+
+Documentación interactiva en `/api/docs`, definición OpenAPI en `/api/docs-json`. Consulta `DEMO-SWAGGER.md` para ejecutar el login y usar Authorize con solo el token.

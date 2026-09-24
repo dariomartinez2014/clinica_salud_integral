@@ -6,7 +6,7 @@ PacientesModule exporta PacientesService. CitasModule importa PacientesModule e 
 
 El modelo real es Cita. Sus campos son pacienteId, medicoId, fecha y motivo; no se modificó schema.prisma. medicoId se pasa como valor plano, sin importar MedicosModule ni inyectar MedicosService. La clave foránea de la base sigue requiriendo un médico existente. fecha se convierte del texto ISO recibido a Date. El estado inicial PROGRAMADA lo asigna Prisma según el modelo.
 
-POST /citas crea una cita y GET /citas lista las citas. Ambas rutas conservan los guards JWT y de rol RECEPCIONISTA. El contrato CrearCita solo aporta tipos a TypeScript; no es un DTO ni introduce validación del cuerpo en esta entrega.
+POST /citas crea una cita y GET /citas lista las citas. Ambas rutas conservan los guards JWT y de rol RECEPCIONISTA. Desde la entrega de Swagger, CreateCitaDto documenta y valida IDs enteros positivos, fecha ISO y motivo opcional.
 
 ## Demo
 
@@ -16,7 +16,7 @@ Ejecuta en orden:
 
 1. Login: 200.
 2. Consultar pacientes y médicos: 200, guarda IDs.
-3. Crear con pacienteId -1 (inexistente en los datos normales): 404, "El paciente no existe".
+3. Crear con pacienteId 2147483647 (inexistente en los datos normales): 404, "El paciente no existe".
 4. Crear con IDs válidos: 201.
 5. Listar /citas: 200, incluye la cita creada.
 
