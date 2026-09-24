@@ -16,7 +16,8 @@
     "lint": "oxlint src/",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
-    "test:e2e": "pnpm run build && node test/crud.e2e.mjs"
+    "test:e2e": "pnpm run build && node test/crud.e2e.mjs",
+    "test:citas": "pnpm run build && node test/citas.e2e.mjs"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
