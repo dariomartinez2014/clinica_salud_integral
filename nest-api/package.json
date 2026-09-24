@@ -18,10 +18,12 @@
     "prisma:validate": "prisma validate",
     "test:e2e": "pnpm run build && node test/crud.e2e.mjs",
     "test:citas": "pnpm run build && node test/citas.e2e.mjs",
-    "test:swagger": "pnpm run build && node test/swagger.e2e.mjs"
+    "test:swagger": "pnpm run build && node test/swagger.e2e.mjs",
+    "test:config": "pnpm run build && node test/config.e2e.mjs"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",
+    "@nestjs/config": "^12.0.1",
     "@nestjs/core": "^12.0.1",
     "@nestjs/mapped-types": "^12.0.0",
     "@nestjs/platform-express": "^12.0.1",
@@ -32,6 +34,7 @@
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "dotenv": "^17.4.2",
+    "joi": "^18.2.9",
     "jsonwebtoken": "^9.0.3",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1"

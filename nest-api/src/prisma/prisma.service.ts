@@ -1,17 +1,26 @@
-import { Injectable, type OnModuleInit, type OnModuleDestroy } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import {
+  Injectable,
+  type OnModuleInit,
+  type OnModuleDestroy,
+} from '@nestjs/common';
 import { PrismaClient } from '../../generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
-  constructor() {
-    const connectionString = process.env.DATABASE_URL;
-    if (!connectionString) {
-      throw new Error('Falta DATABASE_URL: copia el .env de tu proyecto de la Semana 5.');
-    }
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
+  constructor(configService: ConfigService) {
+    const connectionString = configService.getOrThrow<string>('DATABASE_URL');
     super({ adapter: new PrismaPg({ connectionString }) });
   }
 
-  async onModuleInit() { await this.$connect(); }
-  async onModuleDestroy() { await this.$disconnect(); }
+  async onModuleInit() {
+    await this.$connect();
+  }
+  async onModuleDestroy() {
+    await this.$disconnect();
+  }
 }
