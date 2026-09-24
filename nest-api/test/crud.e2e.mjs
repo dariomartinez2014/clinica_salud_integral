@@ -6,6 +6,8 @@ import { CreatePacienteDto } from '../dist/src/pacientes/dto/create-paciente.dto
 import { CreateMedicoDto } from '../dist/src/medicos/dto/create-medico.dto.js';
 import 'dotenv/config';
 import assert from 'node:assert/strict';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../dist/src/app.module.js';
 import { PrismaService } from '../dist/src/prisma/prisma.service.js';
@@ -34,6 +36,8 @@ for (const [serviceType, dtoType] of [
   };
 }
 const created = [];
+const users = [];
+let token;
 let checks = 0;
 try {
   await app.listen(0, '127.0.0.1');
@@ -48,10 +52,13 @@ try {
     'Debe existir una especialidad en la base de práctica para crear el médico.',
   );
   console.log('Especialidad usada: ' + specialty.id);
-  async function request(method, path, status, body) {
+  async function request(method, path, status, body, authorization = token) {
     const response = await fetch(base + path, {
       method,
-      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      headers: {
+        ...(body ? { 'Content-Type': 'application/json' } : {}),
+        ...(authorization ? { Authorization: 'Bearer ' + authorization } : {}),
+      },
       body: body ? JSON.stringify(body) : undefined,
     });
     const json = await response.json();
@@ -65,6 +72,64 @@ try {
     console.log(method + ' ' + path + ' -> ' + status);
     return json;
   }
+  const tokens = {};
+  for (const role of ['RECEPCIONISTA', 'MEDICO', 'GERENCIA']) {
+    const credentials = {
+      email: 'guards-' + crypto.randomUUID() + '@example.com',
+      password: 'Prueba123456',
+    };
+    const user = await request('POST', '/auth/register', 201, {
+      ...credentials,
+      role,
+    });
+    users.push({ id: user.id, email: user.email });
+    assert.equal(Object.hasOwn(user, 'password'), false);
+    const stored = await prisma.user.findUnique({ where: { id: user.id } });
+    assert.notEqual(stored.password, credentials.password);
+    assert.ok(await bcrypt.compare(credentials.password, stored.password));
+    await request('POST', '/auth/register', 409, { ...credentials, role });
+    await request('POST', '/auth/login', 401, {
+      ...credentials,
+      password: 'Incorrecta123',
+    });
+    const login = await request('POST', '/auth/login', 200, credentials);
+    tokens[role] = login.token;
+    const payload = jwt.verify(login.token, process.env.JWT_SECRET);
+    assert.equal(payload.exp - payload.iat, 8 * 60 * 60);
+  }
+  await request('POST', '/auth/register', 400, {
+    email: 'mal',
+    password: 'x',
+    role: 'ADMIN',
+  });
+  await request('POST', '/auth/login', 401, {
+    email: 'missing-' + crypto.randomUUID() + '@example.com',
+    password: 'Prueba123456',
+  });
+  const payload = {
+    id: users[0].id,
+    email: users[0].email,
+    role: 'RECEPCIONISTA',
+  };
+  const expired = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: -1 });
+  const forged = jwt.sign(payload, 'otra-clave-que-no-es-la-clave-real-123');
+  for (const route of ['pacientes', 'medicos']) {
+    for (const [method, path] of [
+      ['GET', '/' + route],
+      ['GET', '/' + route + '/1'],
+      ['POST', '/' + route],
+      ['PUT', '/' + route + '/1'],
+      ['DELETE', '/' + route + '/1'],
+    ]) {
+      await request(method, path, 401, undefined, null);
+      await request(method, path, 403, undefined, tokens.MEDICO);
+      await request(method, path, 403, undefined, tokens.GERENCIA);
+    }
+    for (const bad of ['invalido', expired, forged])
+      await request('GET', '/' + route, 401, undefined, bad);
+    await request('GET', '/' + route, 200, undefined, tokens.RECEPCIONISTA);
+  }
+  token = tokens.RECEPCIONISTA;
   for (const [route, model, extra] of [
     ['pacientes', 'paciente', { fechaNacimiento: '2000-01-15T00:00:00.000Z' }],
     ['medicos', 'medico', { especialidadId: specialty.id }],
@@ -166,6 +231,7 @@ try {
 } finally {
   try {
     const prisma = app.get(PrismaService);
+    for (const user of users) await prisma.user.deleteMany({ where: user });
     for (const item of created.reverse()) {
       await prisma[item.model].deleteMany({
         where: { id: item.id, email: item.email },
