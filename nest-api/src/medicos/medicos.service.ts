@@ -1,7 +1,6 @@
 import { CreateMedicoDto } from './dto/create-medico.dto.js';
 import { UpdateMedicoDto } from './dto/update-medico.dto.js';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '../../generated/prisma/client.js';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 @Injectable()
@@ -20,31 +19,11 @@ export class MedicosService {
     return this.prisma.medico.create({ data });
   }
 
-  async update(id: number, data: UpdateMedicoDto) {
-    try {
-      return await this.prisma.medico.update({ where: { id }, data });
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
-      ) {
-        throw new NotFoundException('Médico no encontrado');
-      }
-      throw error;
-    }
+  update(id: number, data: UpdateMedicoDto) {
+    return this.prisma.medico.update({ where: { id }, data });
   }
 
-  async remove(id: number) {
-    try {
-      return await this.prisma.medico.delete({ where: { id } });
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2025'
-      ) {
-        throw new NotFoundException('Médico no encontrado');
-      }
-      throw error;
-    }
+  remove(id: number) {
+    return this.prisma.medico.delete({ where: { id } });
   }
 }
