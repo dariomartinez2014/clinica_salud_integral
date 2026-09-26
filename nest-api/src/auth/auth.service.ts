@@ -2,13 +2,14 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { secretoJWT } from './auth-token.js';
+import { ConfigService } from '@nestjs/config';
 import type { RegisterDto } from './dto/register.dto.js';
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService) {
-    secretoJWT();
-  }
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
   async register(data: RegisterDto) {
     const password = await bcrypt.hash(data.password, 10);
     return this.prisma.user.create({
@@ -28,7 +29,7 @@ export class AuthService {
     }
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
-      secretoJWT(),
+      this.configService.getOrThrow<string>('JWT_SECRET'),
       { algorithm: 'HS256', expiresIn: '8h' },
     );
     return { token };

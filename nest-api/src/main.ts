@@ -1,7 +1,7 @@
 import { setupSwagger } from './swagger.js';
 import { PrismaExceptionFilter } from './prisma/prisma-exception.filter.js';
 import { ValidationPipe } from '@nestjs/common';
-import 'dotenv/config';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
 import { LoggingInterceptor } from './common/logging.interceptor.js';
@@ -13,6 +13,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
   setupSwagger(app);
   app.enableShutdownHooks();
-  await app.listen(process.env.PORT ?? 3000);
+  const configService = app.get(ConfigService);
+  await app.listen(configService.getOrThrow<number>('PORT'));
 }
 void bootstrap();

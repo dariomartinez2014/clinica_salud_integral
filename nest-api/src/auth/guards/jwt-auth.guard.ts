@@ -5,9 +5,12 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import jwt from 'jsonwebtoken';
-import { secretoJWT, type AuthRequest } from '../auth-token.js';
+import type { AuthRequest } from '../auth-token.js';
+import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
+  constructor(private readonly configService: ConfigService) {}
+
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<AuthRequest>();
     const match = /^Bearer ([^\s]+)$/i.exec(
@@ -15,9 +18,13 @@ export class JwtAuthGuard implements CanActivate {
     );
     if (!match) throw new UnauthorizedException('Token no proporcionado');
     try {
-      const payload = jwt.verify(match[1], secretoJWT(), {
-        algorithms: ['HS256'],
-      });
+      const payload = jwt.verify(
+        match[1],
+        this.configService.getOrThrow<string>('JWT_SECRET'),
+        {
+          algorithms: ['HS256'],
+        },
+      );
       if (
         typeof payload === 'string' ||
         !Number.isInteger(payload.id) ||

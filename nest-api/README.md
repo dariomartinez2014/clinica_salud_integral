@@ -97,3 +97,25 @@ El PR del jueves debe permanecer abierto hasta su revisión.
 ## Swagger (martes)
 
 Documentación interactiva en `/api/docs`, definición OpenAPI en `/api/docs-json`. Consulta `DEMO-SWAGGER.md` para ejecutar el login y usar Authorize con solo el token.
+
+## Configuración de entornos (jueves)
+
+`ConfigModule` es global y valida la configuración al arrancar. `ConfigService` obtiene las variables tanto de `.env` como del entorno del proceso; en Docker se pueden inyectar sin crear un archivo `.env` dentro de la imagen. Las variables del proceso tienen prioridad.
+
+- `DATABASE_URL`: obligatoria.
+- `JWT_SECRET`: obligatoria, mínimo 32 caracteres; conserva el requisito anterior del proyecto, más estricto que el mínimo de 10 del ejemplo del curso.
+- `PORT`: entero entre 1 y 65535, predeterminado 3000.
+
+AuthService, JwtAuthGuard, PrismaService y main usan ConfigService. Los Guards ya estaban registrados como providers y aplicados por clase con `@UseGuards(JwtAuthGuard, RolesGuard)`. La configuración de la CLI de Prisma conserva dotenv porque se ejecuta fuera de Nest.
+
+### Comprobación
+
+Desde `nest-api`, con las dependencias y el cliente Prisma generados:
+
+```sh
+pnpm run test:config
+```
+
+La prueba usa un `.env` temporal y persistencia simulada. Comprueba cinco configuraciones inválidas, variables inyectadas sin `.env`, puerto predeterminado, un puerto alternativo cargado desde `.env`, login con bcrypt/JWT reales y acceso protegido 200/401. No modifica tu `.env` ni accede a una base de datos real.
+
+Para comprobarlo manualmente contra tu base de datos, arranca con `pnpm start:dev`, realiza login desde Swagger y usa el token en Authorize. Cambia PORT en `.env`, reinicia y abre Swagger en el nuevo puerto. Quita temporalmente JWT_SECRET (también del entorno del proceso, si está definido) y reinicia: debe aparecer `Config validation error` indicando que JWT_SECRET es obligatorio. Restaura el secreto al finalizar.
