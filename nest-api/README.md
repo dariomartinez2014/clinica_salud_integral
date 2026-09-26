@@ -1,6 +1,6 @@
-# Clínica — CRUD con NestJS y PrismaService
+# Clínica Salud Integral — API NestJS
 
-La API NestJS vive en nest-api. Reutiliza los modelos Paciente y Medico y la base PostgreSQL de la Semana 5.
+La API NestJS vive en `nest-api`. Incluye autenticación JWT, permisos por rol, pacientes, médicos y citas relacionadas con pacientes, sobre PostgreSQL y Prisma.
 
 ## Arrancar
 
@@ -8,12 +8,44 @@ Desde la carpeta nest-api, con Node.js 22.12 o posterior y pnpm 11:
 
 ~~~powershell
 pnpm install
+Copy-Item .env.example .env
+# Configura DATABASE_URL y JWT_SECRET en .env antes de continuar.
 pnpm prisma:generate
 pnpm run start:dev
 ~~~
 
-Debe existir un archivo .env local con DATABASE_URL. Si el puerto 3000 está ocupado, usa otra terminal y ejecuta $env:PORT='3001' antes de iniciar. Cambia también baseUrl en Postman.
-No se necesitan migraciones ni seed para esta entrega.
+Configura `DATABASE_URL` para tu base de práctica y un `JWT_SECRET` propio de al menos 32 caracteres. Copia la plantilla solo si todavía no tienes `.env`; no sobrescribas tu configuración existente. `PORT` es opcional y vale 3000 por defecto. Abre Swagger en `http://localhost:3000/api/docs` (ajusta el puerto si lo cambias).
+Esta entrega reutiliza la base de las semanas anteriores, con el esquema ya aplicado; no introduce migraciones ni requiere volver a ejecutar el seed. La plantilla `.env.example` contiene únicamente marcadores de ejemplo y `.env` está excluido de Git.
+
+## Viernes — Repaso integrador y entrega final
+
+La rama `feature/cierre-semana` parte de `main` después del merge del PR #9 de configuración de entornos.
+
+### Mapa mental de POST /citas
+
+1. **JwtAuthGuard → RolesGuard:** comprueban el JWT y el rol `RECEPCIONISTA`. Si falla la autenticación, se responde 401; si falta permiso, 403. El interceptor y el controlador todavía no se ejecutan.
+2. **LoggingInterceptor (entrada):** guarda la hora inicial y llama a `next.handle()` para continuar. No cambia el body ni la respuesta.
+3. **ValidationPipe:** transforma el body en `CreateCitaDto`, valida sus campos y elimina los no declarados con `whitelist`. Un body inválido termina en 400 antes de entrar al controlador.
+4. **CitasController → CitasService → PacientesService:** el controlador delega la creación. El servicio consulta `PacientesService.findOne(pacienteId)`; si el paciente no existe, lanza `NotFoundException` (404) sin crear la cita. Si existe, Prisma guarda la cita con el médico indicado, que también debe existir.
+5. **Salida exitosa:** la respuesta vuelve por `LoggingInterceptor`. Su `tap()` registra `POST /citas — Nms` y deja pasar el resultado original; Nest envía 201.
+6. **Salida con error:** una excepción no manejada interrumpe el recorrido normal. Si es `PrismaClientKnownRequestError`, `PrismaExceptionFilter` traduce P2002 a 409 y P2025 a 404; otros códigos producen 500 genérico. El 404 de paciente inexistente es una excepción HTTP de Nest y no pasa por ese filtro específico.
+
+El filtro es una salida alternativa ante errores, no un paso obligatorio de cada petición. Como el interceptor actual usa solo el callback de éxito de `tap()`, registra respuestas exitosas; no registra los 400/404 ni los rechazos de los Guards. La duración medida abarca desde la entrada del interceptor hasta la emisión del resultado, no el envío completo por la red.
+
+### Archivos de entrega
+
+| Archivo | Responsabilidad |
+| --- | --- |
+| `src/citas/citas.module.ts` | Importa PacientesModule e inyecta los servicios del recurso |
+| `src/citas/citas.controller.ts` | POST y GET protegidos, con ApiTags y ApiOperation |
+| `src/citas/citas.service.ts` | Comprueba el paciente y persiste/lista citas |
+| `src/citas/dto/create-cita.dto.ts` | Validación y esquema Swagger del body |
+| `src/common/logging.interceptor.ts` | Medición y log de respuestas exitosas |
+| `src/prisma/prisma-exception.filter.ts` | Traducción de errores conocidos de Prisma |
+| `src/main.ts` | Registro global de interceptor, filtro, pipe y Swagger; puerto por ConfigService |
+| `.env.example` | Variables necesarias sin credenciales reales |
+
+La demo de cierre está en [DEMO-CIERRE-SEMANA.md](DEMO-CIERRE-SEMANA.md). Los apartados por día que siguen conservan el historial de las entregas anteriores.
 
 ## Endpoints
 
@@ -36,7 +68,7 @@ No se necesitan migraciones ni seed para esta entrega.
 - Los DTOs declaran los campos editables del modelo Prisma. PartialType permite omitir campos al actualizar; skipNullProperties: false rechaza null en campos obligatorios. telefono conserva su opción de null.
 
 Paciente requiere nombre, apellido, email y fechaNacimiento en formato ISO, por ejemplo 2000-01-15T00:00:00.000Z. Medico requiere nombre, apellido, email y especialidadId de una especialidad existente. telefono es opcional y acepta null.
-Los emails deben ser únicos. Los cuerpos inválidos responden 400. Las respuestas específicas para emails duplicados o relaciones inválidas quedan para una entrega posterior. No elimines registros con citas relacionadas: el esquema restringe esa operación.
+Los emails deben ser únicos: un duplicado responde 409. Los cuerpos inválidos responden 400. Los errores de relaciones que no tienen una traducción específica en el filtro responden 500 genérico. No elimines registros con citas relacionadas: el esquema restringe esa operación.
 
 ## Prueba con Postman
 
