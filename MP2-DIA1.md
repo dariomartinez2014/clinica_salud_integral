@@ -1,16 +1,20 @@
-# MP2 — Día 1: soporte para el dashboard React
+# MP2 — Día 1: conexión con el dashboard
 
-Este cambio conecta el frontend `dariomartinez2014/clinica-frontend` con el backend Express existente.
+El frontend de la clínica necesita consultar las citas por estado. También necesita CORS porque Vite y Express usan puertos distintos.
 
-- CORS permite el origen de Vite `http://localhost:5173` y el preflight de Authorization antes de ejecutar la autenticación.
-- `GET /api/citas` exige JWT y rol `RECEPCIONISTA`, igual que el directorio y los pacientes.
-- `estado=Programada` consulta `PROGRAMADA`.
-- `estado=Completada` consulta `COMPLETADA` y la fecha de la cita dentro del día actual de Guatemala, para “Completadas Hoy”. No existe fecha independiente de finalización en el modelo actual.
-- Un estado no admitido responde 400; sin estado se listan todas las citas.
-- Respuesta: `{ data: Cita[], total: number }`. Los listados existentes de pacientes y médicos conservan sus arrays.
+## Cambios
 
-## Verificación
+- CORS permite peticiones desde `http://localhost:5173`, incluido el token en Authorization.
+- `GET /api/citas` pide token y rol `RECEPCIONISTA`.
+- `estado=Programada` busca citas con estado `PROGRAMADA`.
+- `estado=Completada` busca citas `COMPLETADA` con fecha de hoy en Guatemala. La base no guarda una fecha aparte de finalización.
+- Si el estado no es válido, responde 400. Sin filtro devuelve todas las citas.
+- La respuesta tiene `{ data, total }`. Los pacientes y médicos siguen devolviendo arrays.
 
-`npm run build` correcto. API real con PostgreSQL: health 200, preflight 204 con Authorization, consultas de pacientes/médicos/citas 200, sin token 401 y estado inválido 400. El frontend validó login, spinner, error, reintento y detalle con IDs numéricos.
+## Pruebas
 
-No se alteraron los módulos NestJS ni los cambios de trabajo previos. No se incluyen credenciales de la cuenta local de prueba.
+`npm run build` pasa. Con PostgreSQL conectado, las consultas responden 200 y el preflight de CORS responde 204. Sin token se recibe 401; con un estado inválido, 400.
+
+En el frontend también se probaron el login, el spinner, el error, el botón Reintentar y el detalle con IDs numéricos.
+
+Los cambios anteriores de NestJS quedaron fuera de este commit. Las credenciales de prueba no se suben a Git.

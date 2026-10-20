@@ -43,7 +43,7 @@ export async function actualizarEstado(req: Request, res: Response) {
 }
 
 
-// Listado para el dashboard del MP2. Los estados públicos se validan antes de consultar.
+// Revisar el filtro antes de buscar las citas del dashboard.
 export async function listarCitas(req: Request, res: Response) {
   const estado = req.query.estado;
   if (estado !== undefined && estado !== 'Programada' && estado !== 'Completada') {
