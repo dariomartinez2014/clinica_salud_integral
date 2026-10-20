@@ -42,3 +42,14 @@ export async function actualizarEstado(req: Request, res: Response) {
   }
 }
 
+
+// Listado para el dashboard del MP2. Los estados públicos se validan antes de consultar.
+export async function listarCitas(req: Request, res: Response) {
+  const estado = req.query.estado;
+  if (estado !== undefined && estado !== 'Programada' && estado !== 'Completada') {
+    res.status(400).json({ mensaje: 'Estado inválido: usa Programada o Completada' });
+    return;
+  }
+  const citas = await modelo.consultarCitas(estado);
+  res.json({ data: citas, total: citas.length });
+}
