@@ -2,10 +2,13 @@ import type { Request, Response } from "express";
 import { Prisma } from "../../generated/prisma/client.js";
 import {
   crearPacienteSchema,
+  actualizarPacienteSchema,
   pacienteIdSchema,
 } from "../schemas/paciente.schema.js";
 import {
   insertarPaciente,
+  modificarPaciente,
+  borrarPaciente,
   consultarPacientes,
   consultarExpediente,
 } from "../models/paciente.model.js";
@@ -72,4 +75,30 @@ export async function obtenerExpediente(req: Request, res: Response) {
   }
 
   res.status(200).json(paciente);
+}
+export async function actualizarPaciente(req: Request, res: Response) {
+  const { id } = pacienteIdSchema.parse(req.params);
+  const datos = actualizarPacienteSchema.parse(req.body);
+  res.json(await modificarPaciente(id, datos));
+}
+
+export async function eliminarPaciente(req: Request, res: Response) {
+  const { id } = pacienteIdSchema.parse(req.params);
+  try {
+    await borrarPaciente(id);
+    res.status(204).send();
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2003"
+    ) {
+      res
+        .status(409)
+        .json({
+          mensaje: "No se puede eliminar un paciente con citas registradas",
+        });
+      return;
+    }
+    throw error;
+  }
 }
