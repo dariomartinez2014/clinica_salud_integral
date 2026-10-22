@@ -17,10 +17,7 @@ export function insertarPaciente(datos: CrearPacienteDatos) {
 
 export function consultarPacientes() {
   return prisma.paciente.findMany({
-    orderBy: [
-      { apellido: "asc" },
-      { nombre: "asc" },
-    ],
+    orderBy: [{ apellido: "asc" }, { nombre: "asc" }],
   });
 }
 
@@ -42,4 +39,24 @@ export function consultarExpediente(id: number) {
       },
     },
   });
+}
+export function modificarPaciente(
+  id: number,
+  datos: import("../schemas/paciente.schema.js").ActualizarPacienteDatos,
+) {
+  const { fechaNacimiento, ...campos } = datos;
+  return prisma.paciente.update({
+    where: { id },
+    data: {
+      ...campos,
+      ...(fechaNacimiento
+        ? { fechaNacimiento: new Date(`${fechaNacimiento}T00:00:00.000Z`) }
+        : {}),
+    },
+  });
+}
+
+export function borrarPaciente(id: number) {
+  // La base impide borrar un paciente que tenga citas.
+  return prisma.paciente.delete({ where: { id } });
 }
