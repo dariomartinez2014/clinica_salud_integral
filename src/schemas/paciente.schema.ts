@@ -21,11 +21,9 @@ export const crearPacienteSchema = z.strictObject({
   telefono: z.string().trim().min(1).max(30).optional(),
 
   // Rechaza fechas inválidas y fechas de nacimiento futuras.
-  fechaNacimiento: z.iso
-    .date()
-    .refine((fecha) => fecha <= obtenerHoy(), {
-      message: "La fecha de nacimiento no puede estar en el futuro",
-    }),
+  fechaNacimiento: z.iso.date().refine((fecha) => fecha <= obtenerHoy(), {
+    message: "La fecha de nacimiento no puede estar en el futuro",
+  }),
 });
 
 // Valida el identificador recibido en la dirección de la solicitud.
@@ -45,3 +43,9 @@ export const actualizarPacienteSchema = crearPacienteSchema
     message: "Envía al menos un campo para actualizar",
   });
 export type ActualizarPacienteDatos = z.infer<typeof actualizarPacienteSchema>;
+
+export const buscarPacientesSchema = z.object({
+  query: z.string().trim().max(150).default(""),
+  pagina: z.coerce.number().int().min(1).max(100000).default(1),
+  limite: z.coerce.number().int().min(1).max(100).default(12),
+});

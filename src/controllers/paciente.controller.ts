@@ -2,11 +2,13 @@ import type { Request, Response } from "express";
 import { Prisma } from "../../generated/prisma/client.js";
 import {
   crearPacienteSchema,
+  buscarPacientesSchema,
   actualizarPacienteSchema,
   pacienteIdSchema,
 } from "../schemas/paciente.schema.js";
 import {
   insertarPaciente,
+  buscarPacientes,
   modificarPaciente,
   borrarPaciente,
   consultarPacientes,
@@ -49,7 +51,18 @@ export async function crearPaciente(req: Request, res: Response) {
   }
 }
 
-export async function listarPacientes(_req: Request, res: Response) {
+export async function listarPacientes(req: Request, res: Response) {
+  const filtros = buscarPacientesSchema.parse(req.query);
+  if (req.query.pagina !== undefined || req.query.limite !== undefined) {
+    res.json(
+      await buscarPacientes(filtros.query, filtros.pagina, filtros.limite),
+    );
+    return;
+  }
+  if (filtros.query) {
+    res.json((await buscarPacientes(filtros.query, 1, 100)).data);
+    return;
+  }
   const pacientes = await consultarPacientes();
   res.status(200).json(pacientes);
 }
@@ -92,11 +105,9 @@ export async function eliminarPaciente(req: Request, res: Response) {
       error instanceof Prisma.PrismaClientKnownRequestError &&
       error.code === "P2003"
     ) {
-      res
-        .status(409)
-        .json({
-          mensaje: "No se puede eliminar un paciente con citas registradas",
-        });
+      res.status(409).json({
+        mensaje: "No se puede eliminar un paciente con citas registradas",
+      });
       return;
     }
     throw error;
