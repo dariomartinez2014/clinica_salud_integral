@@ -29,6 +29,6 @@ export async function login(req: Request, res: Response) {
   }
   const token = jwt.sign({ id: user.id, email: user.email, role: user.role },
     secretoJWT(), { algorithm: "HS256", expiresIn: "8h" });
-  res.json({ token });
+  res.json({ token, usuario: { id: user.id, nombre: user.nombre, email: user.email, rol: user.role } });
 }
 
