@@ -1,3 +1,4 @@
+import cors from 'cors';
 import express from "express";
 import type { ErrorRequestHandler } from "express";
 import swaggerUi from "swagger-ui-express";
@@ -14,6 +15,8 @@ import { reporteRouter } from "./routes/reporte.routes.js";
 
 secretoJWT();
 export const app = express();
+// Vite usa un origen distinto al de Express.
+app.use(cors({ origin: 'http://localhost:5173' }));
 app.use(express.json({ limit: "1mb" }));
 const docs = JSON.parse(readFileSync("swagger-output.json", "utf8").replace(/^\uFEFF/, "")) as object;
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(docs));
@@ -43,4 +46,5 @@ const errores: ErrorRequestHandler = (error: unknown, _req, res, _next) => {
   res.status(500).json({ mensaje: "Error interno del servidor" });
 };
 app.use(errores);
+
 
