@@ -79,3 +79,12 @@ Las pruebas no sustituyen revisión y aprobación de los PR por el docente.
 Se documenta el trabajo real realizado en esta integración; no se recrean PR históricos ficticios.
 Pendiente conectar el repositorio remoto y abrir el PR para revisión. No subir .env, node_modules, dist ni generated.
 
+
+
+## MP3 — Día 3: perfil con foto
+
+La ruta autenticada `PUT /api/auth/perfil` recibe multipart/form-data con nombre, email, telefono opcional y foto opcional de hasta 5 MB. Guarda telefono y foto en el usuario y devuelve { id, nombre, email, rol, telefono, foto }. `GET /api/auth/me` y login devuelven el mismo perfil.
+
+Antes de iniciar: `npm ci`, `npx prisma generate --config prisma7.config.ts`, `npx prisma migrate deploy --config prisma7.config.ts`, `npm run build` y `npm start`. `npm run test:perfil` ejecuta 20 comprobaciones y elimina su usuario temporal.
+
+Las fotos se guardan localmente en uploads/perfiles (ignorado por Git) y se sirven con nombres UUID. Se valida la firma del archivo y se aceptan PNG, JPG, WebP, GIF y AVIF; no se acepta SVG. En un despliegue se debe proveer almacenamiento persistente.

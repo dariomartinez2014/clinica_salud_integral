@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { z } from "zod";
 import { crearUsuario, buscarUsuario } from "../models/auth.model.js";
+import { serializarPerfil } from "./perfil.controller.js";
 import { secretoJWT } from "../middlewares/auth.middleware.js";
 
 const loginSchema = z.strictObject({
@@ -29,6 +30,6 @@ export async function login(req: Request, res: Response) {
   }
   const token = jwt.sign({ id: user.id, email: user.email, role: user.role },
     secretoJWT(), { algorithm: "HS256", expiresIn: "8h" });
-  res.json({ token, usuario: { id: user.id, nombre: user.nombre, email: user.email, rol: user.role } });
+  res.json({ token, usuario: serializarPerfil(user, req) });
 }
 
