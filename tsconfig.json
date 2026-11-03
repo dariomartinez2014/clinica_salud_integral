@@ -25,6 +25,7 @@
 
     // Facilita importar las librerías del proyecto.
     "esModuleInterop": true,
+    "resolveJsonModule": true,
 
     // Omite la revisión interna de tipos de las dependencias.
     "skipLibCheck": true,

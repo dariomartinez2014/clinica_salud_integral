@@ -7,6 +7,19 @@ import { z } from "zod";
 import { prisma } from "../config/prisma.js";
 
 export const directorioFotos = resolve("uploads/perfiles");
+const usarBaseDeDatos = () => process.env.UPLOAD_STORAGE === "database" || !!process.env.VERCEL;
+export async function servirFoto(req: Request, res: Response) {
+  const nombre = String(req.params.nombre);
+  if (!/^[a-f0-9-]{36}\.(png|jpg|jpeg|webp|gif|avif)$/.test(nombre)) { res.status(404).json({ mensaje: "Foto no encontrada" }); return; }
+  const foto = await prisma.fotoPerfil.findUnique({ where: { nombre } });
+  if (!foto) { res.status(404).json({ mensaje: "Foto no encontrada" }); return; }
+  res.setHeader("Content-Type", foto.tipo); res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Cache-Control", "public, max-age=86400"); res.send(Buffer.from(foto.contenido));
+}
+async function borrarFoto(nombre: string) {
+  if (usarBaseDeDatos()) await prisma.fotoPerfil.deleteMany({ where: { nombre } });
+  else await unlink(resolve(directorioFotos, nombre)).catch(() => {});
+}
 const schema = z.strictObject({
   nombre: z.string().trim().min(3).max(100),
   email: z.string().trim().toLowerCase().pipe(z.email()),
@@ -35,8 +48,12 @@ export async function actualizarPerfil(req: Request, res: Response) {
       res.status(400).json({ mensaje: "Selecciona una imagen PNG, JPG, WebP, GIF o AVIF válida" }); return;
     }
     nombreFoto = `${randomUUID()}.${tipo.ext}`;
-    await mkdir(directorioFotos, { recursive: true });
-    await writeFile(resolve(directorioFotos, nombreFoto), req.file.buffer, { flag: "wx" });
+    if (usarBaseDeDatos()) {
+      await prisma.fotoPerfil.create({ data: { nombre: nombreFoto, contenido: new Uint8Array(req.file.buffer), tipo: tipo.mime } });
+    } else {
+      await mkdir(directorioFotos, { recursive: true });
+      await writeFile(resolve(directorioFotos, nombreFoto), req.file.buffer, { flag: "wx" });
+    }
   }
   try {
     const u = await prisma.user.update({ where: { id: req.user!.id }, data: {
@@ -46,7 +63,7 @@ export async function actualizarPerfil(req: Request, res: Response) {
     }, select: seleccion });
     res.json(serializarPerfil(u, req));
   } catch (error) {
-    if (nombreFoto) await unlink(resolve(directorioFotos, nombreFoto)).catch(() => {});
+    if (nombreFoto) await borrarFoto(nombreFoto).catch(() => {});
     throw error;
   }
 }

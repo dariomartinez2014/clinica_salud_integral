@@ -1,0 +1,11 @@
+.git
+.env
+.env.*
+node_modules
+dist
+docs
+scripts
+generated
+uploads
+nest-api
+backup-compilacion-anterior

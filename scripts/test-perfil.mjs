@@ -23,4 +23,4 @@ const photo=await fetch(u.foto);assert.equal(photo.status,200);assert.ok(photo.h
 const {data:u2}=await call('/auth/perfil',{method:'PUT',headers,body:form('Nombre Sin Foto','')});assert.equal(u2.foto,u.foto);assert.equal(u2.telefono,null);checks+=2;
 const {data:login2}=await call('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:'PruebaPerfil123!'})});assert.equal(login2.usuario.foto,u.foto);checks++;
 console.log(`OK: ${checks} comprobaciones reales de perfil, multipart, archivos, persistencia y login.`);
-}finally{if(id)await prisma.user.delete({where:{id}});for(const f of fotos)await unlink(resolve(directorioFotos,f)).catch(()=>{});await new Promise(r=>server.close(r));await prisma.$disconnect();}
+}finally{if(id)await prisma.user.delete({where:{id}});if(process.env.UPLOAD_STORAGE==='database')await prisma.fotoPerfil.deleteMany({where:{nombre:{in:fotos}}});for(const f of fotos)await unlink(resolve(directorioFotos,f)).catch(()=>{});await new Promise(r=>server.close(r));await prisma.$disconnect();}

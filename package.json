@@ -1,7 +1,7 @@
 {
   "name": "clinica-salud-integral",
   "version": "1.0.0",
-  "description": "API REST para la Cl\u00c3\u00adnica Salud Integral",
+  "description": "API REST para la ClÃ­nica Salud Integral",
   "private": true,
   "type": "module",
   "main": "dist/src/index.js",
@@ -16,7 +16,9 @@
     "prisma:seed": "node dist/prisma/seed.js",
     "docs": "node scripts/swagger.cjs",
     "test:integration": "npm run build && node scripts/integration.mjs",
-    "test:perfil": "npm run build && node scripts/test-perfil.mjs"
+    "test:perfil": "npm run build && node scripts/test-perfil.mjs",
+    "vercel-build": "prisma generate --config prisma7.config.ts && npm run build",
+    "prisma:deploy": "prisma migrate deploy --config prisma7.config.ts"
   },
   "keywords": [],
   "author": "",
@@ -30,12 +32,14 @@
     "@types/pg": "^8.23.1",
     "@types/swagger-ui-express": "^4.1.8",
     "prisma": "^7.10.0",
+    "swagger-autogen": "^2.23.7",
     "tsx": "^4.23.13",
-    "typescript": "^7.0.2"
+    "typescript": "~6.0.3"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
+    "@vercel/functions": "^3.10.6",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
@@ -44,8 +48,10 @@
     "jsonwebtoken": "^9.0.3",
     "multer": "^2.5.0",
     "pg": "^8.23.0",
-    "swagger-autogen": "^2.23.7",
     "swagger-ui-express": "^5.0.1",
     "zod": "^4.5.4"
+  },
+  "engines": {
+    "node": "24.x"
   }
 }

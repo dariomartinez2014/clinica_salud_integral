@@ -94,3 +94,12 @@ model Cita {
   @@index([fecha, estado])
   @@map("citas")
 }
+// Las funciones serverless no conservan archivos locales entre ejecuciones.
+model FotoPerfil {
+  nombre    String   @id
+  contenido Bytes
+  tipo      String
+  createdAt DateTime @default(now())
+
+  @@map("fotos_perfil")
+}

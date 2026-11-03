@@ -14,3 +14,7 @@ backup-compilacion-anterior/
 .windsurf/
 
 /uploads/
+
+.vercel/
+.vercel
+.env*
