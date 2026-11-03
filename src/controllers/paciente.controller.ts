@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí recibo las peticiones de paciente, proceso sus datos y preparo la respuesta HTTP.
 import type { Request, Response } from "express";
 import { Prisma } from "../../generated/prisma/client.js";
 import {
@@ -95,6 +96,7 @@ export async function actualizarPaciente(req: Request, res: Response) {
   res.json(await modificarPaciente(id, datos));
 }
 
+// Aquí solicito eliminar el paciente y dejo que la base aplique sus restricciones.
 export async function eliminarPaciente(req: Request, res: Response) {
   const { id } = pacienteIdSchema.parse(req.params);
   try {

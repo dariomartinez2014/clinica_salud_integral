@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí recibo las peticiones de directorio, proceso sus datos y preparo la respuesta HTTP.
 import type { Request, Response } from "express";
 import { Prisma } from "../../generated/prisma/client.js";
 import {

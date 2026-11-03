@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí defino las reglas que deben cumplir los datos antes de usarlos o enviarlos.
 import { z } from "zod";
 
 // Valida los datos de una especialidad.

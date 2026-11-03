@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí recibo las peticiones de reporte, proceso sus datos y preparo la respuesta HTTP.
 import type { Request, Response } from "express";
 import { z } from "zod";
 import * as modelo from "../models/reporte.model.js";

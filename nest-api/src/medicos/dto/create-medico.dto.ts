@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí describo y valido los campos que acepta la operación del módulo.
 import {
   IsInt,
   Min,

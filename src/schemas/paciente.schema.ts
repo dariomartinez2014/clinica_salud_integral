@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí defino las reglas que deben cumplir los datos antes de usarlos o enviarlos.
 import { z } from "zod";
 
 // Obtiene la fecha de hoy según el calendario local del servidor.

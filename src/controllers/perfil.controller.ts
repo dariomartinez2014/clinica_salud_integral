@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí recibo las peticiones de perfil, proceso sus datos y preparo la respuesta HTTP.
 import type { Request, Response } from "express";
 import { mkdir, writeFile, unlink } from "node:fs/promises";
 import { resolve } from "node:path";
@@ -8,6 +9,7 @@ import { prisma } from "../config/prisma.js";
 
 export const directorioFotos = resolve("uploads/perfiles");
 const usarBaseDeDatos = () => process.env.UPLOAD_STORAGE === "database" || !!process.env.VERCEL;
+// Aquí busco la foto persistida y respondo con su contenido y tipo de archivo.
 export async function servirFoto(req: Request, res: Response) {
   const nombre = String(req.params.nombre);
   if (!/^[a-f0-9-]{36}\.(png|jpg|jpeg|webp|gif|avif)$/.test(nombre)) { res.status(404).json({ mensaje: "Foto no encontrada" }); return; }

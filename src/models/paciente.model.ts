@@ -1,6 +1,8 @@
+// Apunte de estudio: Aquí agrupo las consultas de paciente a la base de datos para separarlas de las respuestas HTTP.
 import { prisma } from "../config/prisma.js";
 import type { CrearPacienteDatos } from "../schemas/paciente.schema.js";
 
+// Aquí convierto los datos recibidos y creo el paciente con Prisma.
 export function insertarPaciente(datos: CrearPacienteDatos) {
   return prisma.paciente.create({
     data: {
@@ -15,12 +17,14 @@ export function insertarPaciente(datos: CrearPacienteDatos) {
   });
 }
 
+// Aquí leo los pacientes desde la base con el orden definido en la consulta.
 export function consultarPacientes() {
   return prisma.paciente.findMany({
     orderBy: [{ apellido: "asc" }, { nombre: "asc" }],
   });
 }
 
+// Aquí recupero el paciente con las citas y relaciones incluidas en su expediente.
 export function consultarExpediente(id: number) {
   return prisma.paciente.findUnique({
     where: { id },
@@ -40,6 +44,7 @@ export function consultarExpediente(id: number) {
     },
   });
 }
+// Aquí preparo los campos recibidos antes de actualizar el paciente en la base.
 export function modificarPaciente(
   id: number,
   datos: import("../schemas/paciente.schema.js").ActualizarPacienteDatos,

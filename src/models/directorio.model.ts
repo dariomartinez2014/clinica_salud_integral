@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí agrupo las consultas de directorio a la base de datos para separarlas de las respuestas HTTP.
 import { prisma } from "../config/prisma.js";
 import type {
   EspecialidadDatos,

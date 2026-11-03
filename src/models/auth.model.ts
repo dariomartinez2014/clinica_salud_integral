@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí agrupo las consultas de auth a la base de datos para separarlas de las respuestas HTTP.
 import { prisma } from "../config/prisma.js";
 import type { AuthPayload } from "../middlewares/auth.middleware.js";
 // El modelo es la única capa que accede a la tabla users.

@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí agrupo las consultas de cita a la base de datos para separarlas de las respuestas HTTP.
 import { prisma } from "../config/prisma.js";
 import type { DatosCita } from "../middlewares/validate-appointment.js";
 export function buscarPaciente(id: number) { return prisma.paciente.findUnique({ where: { id } }); }

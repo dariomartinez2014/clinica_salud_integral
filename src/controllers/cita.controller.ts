@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí recibo las peticiones de cita, proceso sus datos y preparo la respuesta HTTP.
 import type { Request, Response } from "express";
 import { Prisma } from "../../generated/prisma/client.js";
 import { idSchema, agendaSchema } from "../middlewares/validate-appointment.js";
@@ -5,6 +6,7 @@ import type { DatosCita } from "../middlewares/validate-appointment.js";
 import { appointmentStatusSchema } from "../middlewares/validate-status.js";
 import * as modelo from "../models/cita.model.js";
 
+// Aquí compruebo que existan paciente y médico antes de registrar la cita.
 export async function agendar(req: Request, res: Response) {
   // #swagger.tags = ['Citas']
   // #swagger.security = [{ "bearerAuth": [] }]
@@ -17,6 +19,7 @@ export async function agendar(req: Request, res: Response) {
   }
   res.status(201).json(await modelo.crearCita(data));
 }
+// Aquí valido los parámetros y consulto la agenda del médico solicitado.
 export async function agenda(req: Request, res: Response) {
   // #swagger.tags = ['Citas']
   // #swagger.security = [{ "bearerAuth": [] }]
@@ -27,6 +30,7 @@ export async function agenda(req: Request, res: Response) {
   }
   res.json(await modelo.consultarAgenda(id, from, to));
 }
+// Aquí proceso el cambio de estado de una cita y su resultado.
 export async function actualizarEstado(req: Request, res: Response) {
   // #swagger.tags = ['Citas']
   // #swagger.security = [{ "bearerAuth": [] }]

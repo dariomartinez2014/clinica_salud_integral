@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí verifico el JWT recibido y recupero la identidad que usarán las rutas protegidas.
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import "dotenv/config";

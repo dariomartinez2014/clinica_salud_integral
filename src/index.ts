@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí inicio el servidor local con el puerto configurado para recibir peticiones.
 import "dotenv/config";
 import { app } from "./app.js";
 import { prisma } from "./config/prisma.js";

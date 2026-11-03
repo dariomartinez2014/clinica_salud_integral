@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí reúno la lógica de prisma-exception.filter que utiliza esta parte del proyecto.
 import {
   ArgumentsHost,
   Catch,

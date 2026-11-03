@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí relaciono las URLs con sus controladores y los controles de acceso que necesita cada operación.
 import { Router } from "express";
 import {
   crearPaciente,

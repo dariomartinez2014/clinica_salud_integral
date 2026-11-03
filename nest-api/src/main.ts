@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí monto la aplicación y conecto su entrada con el elemento raíz del HTML.
 import { PrismaExceptionFilter } from './prisma/prisma-exception.filter.js';
 import { ValidationPipe } from '@nestjs/common';
 import 'dotenv/config';

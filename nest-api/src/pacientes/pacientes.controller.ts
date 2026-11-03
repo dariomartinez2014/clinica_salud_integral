@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí atiendo las rutas del módulo y delego la operación al servicio correspondiente.
 import { CreatePacienteDto } from './dto/create-paciente.dto.js';
 import { UpdatePacienteDto } from './dto/update-paciente.dto.js';
 import {

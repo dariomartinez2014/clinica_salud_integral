@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí preparo la conexión de Prisma con PostgreSQL para reutilizarla en las consultas.
 import "dotenv/config";
 import { Pool } from "pg";
 import { attachDatabasePool } from "@vercel/functions";

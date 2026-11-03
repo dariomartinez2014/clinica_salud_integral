@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí compruebo el rol requerido antes de permitir continuar con la operación.
 import type { Request, Response, NextFunction } from "express";
 import type { AuthPayload } from "./auth.middleware.js";
 

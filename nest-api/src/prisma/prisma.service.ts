@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí concentro las operaciones del módulo y las consultas que necesita el controlador.
 import { Injectable, type OnModuleInit, type OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '../../generated/prisma/client.js';
 import { PrismaPg } from '@prisma/adapter-pg';

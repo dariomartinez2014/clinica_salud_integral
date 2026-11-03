@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí reviso la petición antes del controlador; si los datos no cumplen las reglas, detengo la operación.
 import type { RequestHandler } from "express";
 import { crearPacienteSchema } from "../schemas/paciente.schema.js";
 export { crearPacienteSchema as patientSchema };

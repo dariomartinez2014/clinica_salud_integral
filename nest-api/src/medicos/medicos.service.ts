@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí concentro las operaciones del módulo y las consultas que necesita el controlador.
 import { CreateMedicoDto } from './dto/create-medico.dto.js';
 import { UpdateMedicoDto } from './dto/update-medico.dto.js';
 import { Injectable } from '@nestjs/common';

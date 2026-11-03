@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí concentro las operaciones del módulo y las consultas que necesita el controlador.
 import { CreatePacienteDto } from './dto/create-paciente.dto.js';
 import { UpdatePacienteDto } from './dto/update-paciente.dto.js';
 import { BadRequestException, Injectable } from '@nestjs/common';

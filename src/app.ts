@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí configuro Express, los middlewares y las rutas que atienden las peticiones de la API.
 import cors from 'cors';
 import multer from 'multer';
 import { directorioFotos, servirFoto } from './controllers/perfil.controller.js';

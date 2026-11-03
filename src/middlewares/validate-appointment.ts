@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí reviso la petición antes del controlador; si los datos no cumplen las reglas, detengo la operación.
 import { z } from "zod";
 import type { RequestHandler } from "express";
 // La comparación se ejecuta en cada petición, no solo al iniciar el servidor.
