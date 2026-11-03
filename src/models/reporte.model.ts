@@ -1,3 +1,4 @@
+// Apunte de estudio: Aquí agrupo las consultas de reporte a la base de datos para separarlas de las respuestas HTTP.
 import { prisma } from "../config/prisma.js";
 // Los nombres SQL corresponden a las tablas existentes y sus columnas reales.
 export function citasPorEspecialidad() {
