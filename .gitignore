@@ -12,3 +12,9 @@ backup-compilacion-anterior/
 .agents/
 .claude/
 .windsurf/
+
+/uploads/
+
+.vercel/
+.vercel
+.env*

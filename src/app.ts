@@ -1,7 +1,10 @@
+import cors from 'cors';
+import multer from 'multer';
+import { directorioFotos, servirFoto } from './controllers/perfil.controller.js';
 import express from "express";
 import type { ErrorRequestHandler } from "express";
 import swaggerUi from "swagger-ui-express";
-import { readFileSync } from "node:fs";
+import docs from "../swagger-output.json" with { type: "json" };
 import { Prisma } from "../generated/prisma/client.js";
 import { ZodError } from "zod";
 import { prisma } from "./config/prisma.js";
@@ -14,8 +17,13 @@ import { reporteRouter } from "./routes/reporte.routes.js";
 
 secretoJWT();
 export const app = express();
+// Vite usa un origen distinto al de Express.
+const origenes = (process.env.CORS_ALLOWED_ORIGINS ?? 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:5196,http://127.0.0.1:5196').split(',').map(origen => origen.trim()).filter(Boolean);
+if (process.env.VERCEL) app.set('trust proxy', 1);
+app.use(cors({ origin: origenes, methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], allowedHeaders: ['Content-Type', 'Authorization'] }));
+if (process.env.VERCEL || process.env.UPLOAD_STORAGE === 'database') app.get('/api/fotos/:nombre', servirFoto);
+app.use('/api/fotos', express.static(directorioFotos, { dotfiles: 'deny', index: false, setHeaders: (res) => { res.setHeader('X-Content-Type-Options', 'nosniff'); } }));
 app.use(express.json({ limit: "1mb" }));
-const docs = JSON.parse(readFileSync("swagger-output.json", "utf8").replace(/^\uFEFF/, "")) as object;
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(docs));
 app.get("/", (_req, res) => { res.redirect("/api/docs"); });
 app.get("/api/health", async (_req, res) => {
@@ -31,6 +39,7 @@ app.use("/api", citaRouter);
 app.use((_req, res) => { res.status(404).json({ mensaje: "Ruta no encontrada" }); });
 
 const errores: ErrorRequestHandler = (error: unknown, _req, res, _next) => {
+  if (error instanceof multer.MulterError) { res.status(400).json({ mensaje: error.code === "LIMIT_FILE_SIZE" ? "La imagen no puede superar los 5MB" : "Archivo o campos no permitidos" }); return; }
   if (error instanceof ZodError) { res.status(400).json({ mensaje: "Datos inválidos", errores: error.issues }); return; }
   if (error instanceof SyntaxError && "type" in error && error.type === "entity.parse.failed") {
     res.status(400).json({ mensaje: "JSON inválido" }); return;
@@ -44,3 +53,7 @@ const errores: ErrorRequestHandler = (error: unknown, _req, res, _next) => {
 };
 app.use(errores);
 
+
+
+// Entrada de Express para Vercel; el servidor local mantiene src/index.ts.
+export default app;
